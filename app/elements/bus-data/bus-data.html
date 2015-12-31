@@ -1,0 +1,125 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="bus-data">
+  <style>
+    paper-material {
+      padding-top: 4px;
+      padding-bottom: 4px;
+      padding-left: 24px;
+    }
+  </style>
+  <template>
+    <iron-ajax id="routes" auto
+               url="http://api.umd.io/v0/bus/routes"
+               handle-as="json"
+               last-response="{{routes}}"></iron-ajax>
+    <iron-ajax id="directions" auto
+               url="http://api.umd.io/v0/bus/routes/{{routeId}}"
+               handle-as="json"
+               last-response="{{route}}"></iron-ajax>
+
+    <paper-material>
+      <p>Route: {{routeTitle}}</p>
+      <p>Direction: {{directionTitle}}</p>
+      <p>Stop: {{stopTitle}}</p>
+    </paper-material>
+    <template id="r" is="dom-repeat" items="{{routes}}">
+      <paper-material on-tap="routeSelect">
+        <p>Route: [[item.title]]</p>
+        <!--<p>[[item.route_id]]</p> -->
+      </paper-material>
+    </template>
+    <template is="dom-repeat" items="[[route.directions]]">
+      <paper-material on-tap="directionSelect">
+        <p>Direction: [[item.title]]</p>
+        <!--<p>[[item.direction_id]]</p> -->
+        <template is="dom-repeat" items="[[route.stops]]" as="s">
+          <paper-material  on-tap="stopSelect">
+            <p>[[s.title]]</p>
+            <!--<p>[[s.stop_id]]</p> -->
+          </paper-material>
+        </template>
+      </paper-material>
+    </template>
+  <!--  <template id="stopper" is="dom-repeat" items="[[route.stops]]" as="s">
+      <p>[[s.stop_id]]</p>
+    </template>-->
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+      //{{computeArray(route.directions,route.stops)}}
+      Polymer({
+        is: 'bus-data',
+        properties: {
+          url: {type: String, value: 'hi'},
+          routeId: String,
+          routeTitle: String,
+          directionId: {
+            type: String,
+            value: '',
+          },
+          directionTitle: String,
+          stopId: String,
+          stopTitle: String,
+
+        },
+        routeSelect: function(e) {
+          //console.log(e.model.__data__.item.route_id);
+          //console.log(e.model.__data__.item.title);
+          this.routeId = e.model.__data__.item.route_id;
+          this.routeTitle = e.model.__data__.item.title;
+          console.log(this.routeId);
+          //this.$.stops.render();
+        },
+        directionSelect: function(e) {
+          //console.log(e.model.__data__.item.route_id);
+          //console.log(e.model.__data__.item.title);
+          this.directionId = e.model.__data__.item.direction_id;
+          this.directionTitle = e.model.__data__.item.title;
+          console.log(this.directionId);
+
+        },
+        stopSelect: function(e) {
+          console.log(e.model.s.stop_id);
+          this.stopId = e.model.__data__.s.stop_id;
+          this.stopTitle = e.model.__data__.s.title;
+          console.log('stop:' + this.stopId);
+          console.log(this.stopTitle);
+        }
+        /*_isCorrectDir: function(dir) {
+          console.log(dir + 'DIRRR');
+          console.log(this.directionId + 'DIRRRkk');
+          console.log(this.directionId === dir);
+          return this.directionId === dir;
+        },
+        computeArray: function(directions, allStops) {
+          var newArr = [];
+          for (var i = 0; i < directions.length; i++) {
+            if (directions[i].direction_id === this.directionId) {
+              newArr = directions[i].stops;
+            }
+          }
+          console.log(newArr);
+          //console.log(directions);
+          //console.log(allStops);
+          return newArr;
+        },
+        _Changed: function(){
+          this.set("str",this.translate(this.str));
+        },*/
+      });
+    })();
+  </script>
+</dom-module>
