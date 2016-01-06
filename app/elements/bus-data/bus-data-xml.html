@@ -9,7 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
-<dom-module id="bus-data">
+<dom-module id="bus-data-xml">
   <style>
     paper-material {
       padding-top: 4px;
@@ -18,53 +18,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
   </style>
   <template>
-    <iron-ajax id="routes" auto
-               url="http://api.umd.io/v0/bus/routes"
-               handle-as="json"
-               last-response="{{routes}}"></iron-ajax>
-    <iron-ajax id="directions" auto
-               url="http://api.umd.io/v0/bus/routes/{{routeId}}"
-               handle-as="json"
-               last-response="{{route}}"></iron-ajax>
-    <!-- stops are handled by directions as well -->
-    <iron-ajax id="arrivals" auto
-               handle-as="json"
-               last-response="{{arrivals}}"></iron-ajax>
 
     <paper-material>
       <p>Route: {{routeTitle}}</p>
       <p>Direction: {{directionTitle}}</p>
       <p>Stop: {{stopTitle}}</p>
     </paper-material>
+    <p>XML</p>
     <template id="r" is="dom-repeat" items="{{routes}}">
       <paper-material on-tap="routeSelect">
         <p>Route: [[item.title]]</p>
         <!--<p>[[item.route_id]]</p> -->
       </paper-material>
     </template>
-    <template is="dom-repeat" items="[[route.directions]]">
-      <paper-material on-tap="directionSelect">
-        <p>Direction: [[item.title]]</p>
-        <!--<p>[[item.direction_id]]</p> -->
-        <template is="dom-repeat" items="[[route.stops]]" as="s">
-          <paper-material  on-tap="stopSelect">
-            <p>[[s.title]]</p>
-            <!--<p>[[s.stop_id]]</p> -->
-          </paper-material>
-        </template>
-      </paper-material>
-    </template>
-
-    <paper-material>
-      {{arrivals.predictions.direction.title}}
-      ARRIVALS
-      <template is="dom-repeat" items="{{arrivals.predictions.direction.prediction}}" as="prediction">
-        <p>{{prediction.minutes}} minutes</p>
-      </template>
-    </paper-material>
-    <!--  <template id="stopper" is="dom-repeat" items="[[route.stops]]" as="s">
-        <p>[[s.stop_id]]</p>
-      </template>-->
+    <iron-request id="r"></iron-request>
 
   </template>
 
@@ -73,19 +40,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       'use strict';
       //{{computeArray(route.directions,route.stops)}}
       Polymer({
-        is: 'bus-data',
+        is: 'bus-data-xml',
         properties: {
           url: {type: String, value: 'hi'},
           routeId: String,
           routeTitle: String,
-          directionId: {
+          /*directionId: {
             type: String,
             value: '',
           },
           directionTitle: String,
           stopId: String,
-          stopTitle: String,
+          stopTitle: String, */
 
+        },
+        ready: function() {
         },
         routeSelect: function(e) {
           //console.log(e.model.__data__.item.route_id);
@@ -94,8 +63,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.routeTitle = e.model.__data__.item.title;
           console.log(this.routeId);
           //this.$.stops.render();
+          console.log(this.$.r.routes);
         },
-        directionSelect: function(e) {
+        /*directionSelect: function(e) {
           //console.log(e.model.__data__.item.route_id);
           //console.log(e.model.__data__.item.title);
           this.directionId = e.model.__data__.item.direction_id;
@@ -112,28 +82,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.$.arrivals.url =
             'http://api.umd.io/v0/bus/routes/' + this.routeId + '/arrivals/' + this.stopId;
           console.log(this.$.arrivals.url);
-        }
-        /*_isCorrectDir: function(dir) {
-          console.log(dir + 'DIRRR');
-          console.log(this.directionId + 'DIRRRkk');
-          console.log(this.directionId === dir);
-          return this.directionId === dir;
-        },
-        computeArray: function(directions, allStops) {
-          var newArr = [];
-          for (var i = 0; i < directions.length; i++) {
-            if (directions[i].direction_id === this.directionId) {
-              newArr = directions[i].stops;
-            }
-          }
-          console.log(newArr);
-          //console.log(directions);
-          //console.log(allStops);
-          return newArr;
-        },
-        _Changed: function(){
-          this.set("str",this.translate(this.str));
-        },*/
+        } */
+
       });
     })();
   </script>
