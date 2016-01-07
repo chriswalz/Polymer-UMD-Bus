@@ -25,13 +25,53 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <p>Stop: {{stopTitle}}</p>
     </paper-material>
     <p>XML</p>
-    <template id="r" is="dom-repeat" items="{{routes}}">
+
+
+    <iron-ajax auto
+               url='http://webservices.nextbus.com/service/publicXMLFeed?command=routeList&a=umd'
+               handle-as="xml"
+               on-response="_on_routes_response"></iron-ajax>
+    <!-- used for directions and stops -->
+    <iron-ajax auto
+               url='http://webservices.nextbus.com/service/publicXMLFeed?command=routeConfig&a=umd&r={{routeId}}'
+               handle-as="xml"
+               on-response="_on_route_response"></iron-ajax>
+    <iron-ajax auto
+               url='http://webservices.nextbus.com/service/publicXMLFeed?command=predictions&a=umd&stopId={{stopId}}'
+               handle-as="xml"
+               on-response="_on_stop_response"></iron-ajax>
+    <iron-ajax auto
+               url='http://webservices.nextbus.com/service/publicXMLFeed?command=predictions&a=umd&stopId={{stopId}}&routeTag={{routeId}}'
+               handle-as="xml"
+               on-response="_on_arrival_response"></iron-ajax>
+
+    <paper-dropdown-menu label="Select Route">
+      <paper-listbox id="lb" on-iron-select="routeSelect" class="dropdown-content" selected="{{selected}}">
+        <template is="dom-repeat" items="{{routes}}">
+          <paper-item>[[item.title]]</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
+   <!-- <template id="r" is="dom-repeat" items="{{routes}}">
       <paper-material on-tap="routeSelect">
         <p>Route: [[item.title]]</p>
-        <!--<p>[[item.route_id]]</p> -->
+      </paper-material>
+    </template> -->
+    <!--<template id="d" is="dom-repeat" items="{{directions}}" as="direction">
+      <paper-material on-tap="directionSelect">
+        <p>Direction: [[direction.title]]</p>
+      </paper-material>
+    </template> -->
+    <template id="tr" is="dom-repeat" items="{{dirs}}" as="direction">
+      <paper-material  style="background-color: tomato" on-tap="directionSelect">
+        <p>Direction: [[direction.tag]]</p>
+        <template id="trr" is="dom-repeat" items="{{direction.stops}}" as="stop">
+          <paper-material style="background-color: deepskyblue" on-tap="stopSelect">
+            <p>Stop: [[stop.tag]]</p>
+          </paper-material>
+        </template>
       </paper-material>
     </template>
-    <iron-request id="r"></iron-request>
 
   </template>
 
@@ -45,44 +85,99 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           url: {type: String, value: 'hi'},
           routeId: String,
           routeTitle: String,
-          /*directionId: {
+          directionId: {
             type: String,
             value: '',
           },
           directionTitle: String,
           stopId: String,
-          stopTitle: String, */
+          stopTitle: String,
+          routes: {},
+          directions: {},
+          dirs: {},
+          selected: {},
 
         },
-        ready: function() {
-        },
+        // reset variables needed
+
         routeSelect: function(e) {
-          //console.log(e.model.__data__.item.route_id);
+          e = null;
+          console.log(this.selected + 'hi');
+          var route = this.routes[this.selected];
           //console.log(e.model.__data__.item.title);
-          this.routeId = e.model.__data__.item.route_id;
-          this.routeTitle = e.model.__data__.item.title;
-          console.log(this.routeId);
+          //console.log(e.model.__data__.item.title);
+
+          this.routeId = route.tag;
+          //this.routeId = e.model.__data__.item.tag;
+          this.routeTitle = route.title;
+          //this.routeTitle = e.model.__data__.item.title;
+          //console.log(this.routeId);
           //this.$.stops.render();
-          console.log(this.$.r.routes);
+          //console.log(this.$.r.routes);
         },
-        /*directionSelect: function(e) {
-          //console.log(e.model.__data__.item.route_id);
-          //console.log(e.model.__data__.item.title);
-          this.directionId = e.model.__data__.item.direction_id;
-          this.directionTitle = e.model.__data__.item.title;
-          console.log(this.directionId);
+        directionSelect: function(e) {
+          console.log(e.model);
+          this.directionId = e.model.__data__.direction.tag;
+          this.directionTitle = e.model.__data__.direction.title;
+
+          console.log(this.$.d);
 
         },
         stopSelect: function(e) {
-          console.log(e.model.s.stop_id);
-          this.stopId = e.model.__data__.s.stop_id;
-          this.stopTitle = e.model.__data__.s.title;
-          console.log('stop:' + this.stopId);
-          console.log(this.stopTitle);
-          this.$.arrivals.url =
-            'http://api.umd.io/v0/bus/routes/' + this.routeId + '/arrivals/' + this.stopId;
-          console.log(this.$.arrivals.url);
-        } */
+          this.stopId = e.model.__data__.stop.tag;
+          this.stopTitle = e.model.__data__.stop.tag;
+          //this.stopTitle = e.model.__data__.stop.title;
+          console.log('Remove this implementation?');
+        },
+        _on_routes_response: function(r) {
+          var response = r.detail.response;
+          var list = response.querySelectorAll('route');
+          this.routes = this._help_parse(r, list);
+        },
+        _on_route_response: function(r) {
+          var response = r.detail.response;
+          var directions = response.querySelectorAll('direction');
+          this.directions = this._help_parse(r, directions);
+
+          var stops = [];
+          for (var i = 0; i < directions.length; i++) {
+            var direction = directions[i];
+            //console.log(direction);
+            var children = direction.children;
+            var dir = {
+              tag: direction.getAttribute('tag'),
+              title: direction.getAttribute('title'),
+              stops: []
+            };
+            stops.push(dir);
+            for (var j = 0; j < children.length; j++) {
+              var child = children[j];
+              //console.log(child);
+              var temp = {tag: child.getAttribute('tag')};
+              stops[i].stops.push(temp);
+            }
+          }
+          //console.log(stops);
+          this.dirs = stops;
+        },
+        /*_compute_stops: function(e) {
+          console.log(e);
+        },*/
+        _help_parse: function(r, list) {
+
+          var tempRoutes = [];
+          for (var j = 0; j < list.length; j++) {
+            var elem = list[j];
+            var tempObj = {};
+            for (var i = 0; i < elem.attributes.length; i++) {
+              var attrib = elem.attributes[i];
+              //console.log(attrib.name + ' = ' + attrib.value);
+              tempObj[attrib.name] = attrib.value;
+            }
+            tempRoutes.push(tempObj);
+          }
+          return tempRoutes;
+        },
 
       });
     })();
