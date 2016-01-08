@@ -79,6 +79,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </paper-material>
     <paper-dialog id="dialog">
       <paper-material>[[stopTitle]]</paper-material>
+      <span>[[errorMessage]]</span>
       <template id="trrr" is="dom-repeat" items="{{predictions}}" as="p">
         <paper-material style="background-color: lightgoldenrodyellow" on-tap="stopSelect">
           <span>Prediction: [[p.minutes]] minutes</span>
@@ -112,7 +113,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           directions: {},
           dirs: {},
           selected: {},
-          predictions: {}
+          predictions: {},
+          errorMessage: {}
 
         },
         // reset variables needed
@@ -156,6 +158,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         _on_arrival_response: function(r) {
           var response = r.detail.response;
           var list = response.querySelectorAll('prediction');
+          if (list.length === 0) {
+            this.errorMessage = 'Bus is not running';
+          }
+
           this.predictions = this._help_parse(r, list);
           console.log(this.predictions);
         },
