@@ -1,0 +1,113 @@
+<!--
+UI for arrival page
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="arrival-ui">
+  <style>
+    paper-material {
+      padding-top: 8px;
+      padding-bottom: 8px;
+      padding-left: 24px;
+      margin-left: 4px;
+      margin-right: 4px;
+    }
+    paper-dialog {
+      border: 2px solid;
+      border-color: lightgoldenrodyellow;
+      background-color: white;
+      color: black;
+    }
+    paper-dialog {
+      position: fixed;
+      width: 300px;
+      margin: 16px;
+      overflow: auto;
+    }
+  </style>
+
+  <template>
+    <paper-button on-tap="test" raised="">Sup</paper-button>
+    <paper-material>
+      <p>Route: {{routeTitle}}</p>
+      <p>Direction: {{directionTitle}}</p>
+      <p>Stop: {{stopTitle}}</p>
+    </paper-material>
+    <paper-material style="background-color: honeydew;">
+      <paper-dropdown-menu label="Select Route">
+        <paper-listbox id="lb" on-iron-select="routeSelect" class="dropdown-content" selected="{{selected}}">
+          <template is="dom-repeat" items="{{routes}}">
+            <paper-item>[[item.title]]</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+      <template id="tr" is="dom-repeat" items="{{dirs}}" as="direction">
+        <paper-material  elevation="0" style="background-color: tomato" on-tap="directionSelect">
+          <span>Direction: [[direction.title]]</span>
+          <br>
+          <p></p>
+          <template id="trr" is="dom-repeat" items="{{direction.stops}}" as="stop">
+            <paper-material elevation="0" style="background-color: deepskyblue" on-tap="stopSelect">
+              <span>Stop: [[stop.title]]</span>
+            </paper-material>
+          </template>
+        </paper-material>
+      </template>
+    </paper-material>
+    <paper-dialog id="dialog">
+      <paper-material>[[stopTitle]]</paper-material>
+      <span>[[errorMessage]]</span>
+      <template id="trrr" is="dom-repeat" items="{{predictions}}" as="p">
+        <paper-material style="background-color: lightgoldenrodyellow" on-tap="stopSelect">
+          <span>Prediction: [[p.minutes]] minutes</span>
+        </paper-material>
+      </template>
+      <div class="buttons">
+        <paper-button dialog-confirm>OK</paper-button>
+      </div>
+    </paper-dialog>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'arrival-ui',
+        properties: {
+          routes: {
+            type: Array,
+          },
+          dirs: {},
+          predictions: {},
+          routeTitle: {},
+          directionTitle: {},
+          stopTitle: {},
+          direction: {},
+          selected: {
+            value: 0
+          },
+        },
+        test: function() {
+          console.log('test');
+          console.log(this.routes);
+        },
+        routeSelect: function(e) {
+          e = null;
+          console.log(this.selected + 'hi');
+          var route = this.routes[this.selected];
+          //console.log(e.model.__data__.item.title);
+          //console.log(e.model.__data__.item.title);
+
+          this.routeId = route.tag;
+          //this.routeId = e.model.__data__.item.tag;
+          this.routeTitle = route.title;
+          //this.routeTitle = e.model.__data__.item.title;
+          //console.log(this.routeId);
+          //this.$.stops.render();
+          //console.log(this.$.r.routes);
+        },
+      });
+    })();
+  </script>
+</dom-module>

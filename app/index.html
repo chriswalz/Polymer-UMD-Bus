@@ -75,19 +75,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- Drawer Content -->
         <paper-menu class="list" attr-for-selected="data-route" selected="[[route]]">
           <a data-route="home" href="{{baseUrl}}">
-            <iron-icon icon="home"></iron-icon>
-            <span>Home</span>
+            <iron-icon icon="maps:directions-bus"></iron-icon>
+            <span>Arrivals</span>
           </a>
 
-          <a data-route="users" href="{{baseUrl}}users">
-            <iron-icon icon="info"></iron-icon>
-            <span>Users</span>
+          <a data-route="map" href="{{baseUrl}}map">
+            <iron-icon icon="maps:satellite"></iron-icon>
+            <span>Map</span>
           </a>
 
-          <a data-route="contact" href="{{baseUrl}}contact">
-            <iron-icon icon="mail"></iron-icon>
-            <span>Contact</span>
-          </a>
         </paper-menu>
       </paper-scroll-header-panel>
 
@@ -102,6 +98,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <!-- Toolbar icons -->
           <paper-icon-button icon="refresh"></paper-icon-button>
           <paper-icon-button icon="search"></paper-icon-button>
+          <span>v0.55</span>
 
           <!-- Application name -->
           <div class="middle middle-container center horizontal layout">
@@ -119,11 +116,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="content">
           <iron-pages attr-for-selected="data-route" selected="{{route}}">
 
+            <!--
+                     routeTitle: {},
+          directionTitle: {},
+          stopTitle: {},
+          routes: {},
+          dirs: {},
+          direction: {},
+          predictions: {},
+            -->
             <section data-route="home">
               <!--<bus-data></bus-data> -->
-              <bus-data-xml></bus-data-xml>
-            </section>
+              <bus-data-xml>
 
+              </bus-data-xml>
+            </section>
+            <section data-route="map">
+
+              <umd-map></umd-map>
+            </section>
 
           </iron-pages>
         </div>
